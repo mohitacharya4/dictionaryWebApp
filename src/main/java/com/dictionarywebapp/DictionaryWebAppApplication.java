@@ -8,5 +8,6 @@ public class DictionaryWebAppApplication {
 
 	public static void main(String[] args) {
 		SpringApplication.run(DictionaryWebAppApplication.class, args);
+		System.out.print("Get Started!!");
 	}
 }
