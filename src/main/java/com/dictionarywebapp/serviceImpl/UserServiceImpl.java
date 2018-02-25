@@ -10,8 +10,13 @@ public class UserServiceImpl implements UserService{
 	UserDaoImpl uDao;
 	
 	@Override
-	public List<Words> getWordsList(ApiRequest apiRequest) {
+	public List<Words> getWordsList() {
 		uDao = new UserDaoImpl();
-		return uDao.getWordsListFromDB(apiRequest);
+		return uDao.getWordsListFromDB();
+	}
+	@Override
+	public List<Words> getSampleWordsList() {
+		uDao = new UserDaoImpl();
+		return uDao.getSampleWordsListFromDB();
 	}
 }

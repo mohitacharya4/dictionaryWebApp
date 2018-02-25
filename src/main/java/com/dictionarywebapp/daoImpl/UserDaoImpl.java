@@ -28,8 +28,8 @@ public class UserDaoImpl implements UserDao{
 	Properties pros = null;
 	ApiRequest request =  null;
 	
+	/*Method to get an instance of connection*/
 	public Connection getConnection(){
-
 		try{
 			Properties props = new Properties();
 			props.load(dt.getPropertyfile("/application.properties"));
@@ -45,8 +45,8 @@ public class UserDaoImpl implements UserDao{
 		}
 		return conn;
 	}
-	
-	public List<Words> getWordsListFromDB(ApiRequest request) {
+	/*Method to get the list of words form the Database*/
+	public List<Words> getWordsListFromDB() {
 		List<Words> wordsList=new ArrayList<Words>();
 		ResultSet rs = null;
 		PreparedStatement pst = null;
@@ -56,6 +56,43 @@ public class UserDaoImpl implements UserDao{
 			conn=getConnection();
 			request = new ApiRequest();
 			sql="SELECT id, word, meaning, category from words order by word";
+			pst = conn.prepareStatement(sql);
+			rs = pst.executeQuery();
+
+			while (rs.next()) {
+				word=new Words();
+				word.setId((rs.getInt("id")));
+				word.setWord(rs.getString("word"));
+				word.setMeaning(rs.getString("meaning"));
+				word.setCategory(rs.getString("category"));
+				wordsList.add(word);
+			}
+		}
+		catch(SQLException e){
+			e.printStackTrace();
+		}
+		finally{
+			try {
+				if(rs != null) rs.close();
+				if(pst != null) pst.close();
+				if(conn != null) conn.close();
+			} catch (SQLException e) {
+				e.printStackTrace();
+			}
+		}
+		return wordsList;
+	}
+	/*Method to get the sample list of words from the Database*/
+	public List<Words> getSampleWordsListFromDB() {
+		List<Words> wordsList=new ArrayList<Words>();
+		ResultSet rs = null;
+		PreparedStatement pst = null;
+		Connection conn = null;
+		
+		try{
+			conn=getConnection();
+			request = new ApiRequest();
+			sql="SELECT id, word, meaning, category from sample_words order by word";
 			pst = conn.prepareStatement(sql);
 			rs = pst.executeQuery();
 
