@@ -12,4 +12,5 @@ import com.dictionarywebapp.bean.Words;
 	public boolean addWord(ApiRequest request);
 	public boolean deleteWord(int id);
 	public boolean updateWord(ApiRequest request);
+	public boolean loginPremiumUser(ApiRequest request);
 }

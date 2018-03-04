@@ -132,4 +132,22 @@ public class MainController {
 		
 		return apiResponse;
 	}
+	/*To login the premium member*/
+	@RequestMapping(method = RequestMethod.POST, value = "/loginPremiumUser")
+	public ApiResponse loginPremiumUser(@RequestBody ApiRequest request)
+	{	
+		apiResponse  = new ApiResponse();
+		boolean isLoginSuccessful = false;
+		service = new UserServiceImpl();
+		dt = new Details();
+		constants = dt.getConstants();
+
+		isLoginSuccessful = service.loginPremiumUser(request);
+		if(isLoginSuccessful)
+			apiResponse.setStatus(constants.getProperty("API_STATUS_SUCCESS"));
+		else
+			apiResponse.setStatus(constants.getProperty("API_STATUS_FAILURE"));
+		
+		return apiResponse;
+	}
 }

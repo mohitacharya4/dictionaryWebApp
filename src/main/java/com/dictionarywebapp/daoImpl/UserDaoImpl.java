@@ -12,6 +12,7 @@ import com.dictionarywebapp.bean.ApiRequest;
 import com.dictionarywebapp.bean.Words;
 import com.dictionarywebapp.dao.UserDao;
 import com.dictionarywebapp.utilities.Details;
+import com.dictionarywebapp.utilities.EncryptionDecryptionUtility;
 
 
 public class UserDaoImpl implements UserDao{
@@ -130,7 +131,7 @@ public class UserDaoImpl implements UserDao{
 					+ " values (?,?,?,?)";
 			pst = conn.prepareStatement(query,pst.RETURN_GENERATED_KEYS);
 			pst.setString(1, request.getUserDetails().getName());
-			pst.setString(2, request.getUserDetails().getPassword());
+			pst.setString(2, EncryptionDecryptionUtility.encode(request.getUserDetails().getPassword()));
 			pst.setString(3, request.getUserDetails().getEmail());
 			pst.setBoolean(4, request.getUserDetails().isAdmin());
 			count =	pst.executeUpdate();
@@ -228,6 +229,7 @@ public class UserDaoImpl implements UserDao{
 			pst.setString(2, request.getWord().getMeaning());
 			pst.setString(3, request.getWord().getCategory());    //if this field is not required then from front-end send any default value like "Miscellaneous"			count =	pst.executeUpdate();
 			pst.setInt(4, request.getWord().getId());
+			count =	pst.executeUpdate();
 			rs = pst.getGeneratedKeys();
 			isWordUpdated = count > 0 ? true : false;
 
@@ -243,5 +245,38 @@ public class UserDaoImpl implements UserDao{
 			}
 		}
 		return isWordUpdated;
+	}
+	public boolean loginPremiumUser(ApiRequest request) {
+		boolean isLoginSuccessful = false;
+		ResultSet rs = null;
+		PreparedStatement pst = null;
+		Connection conn = null;
+		int count = 0;
+		
+		try {
+			conn=getConnection();
+			query = "select count(1) from userdetails" + 
+					" WHERE email = ? and password = ?";
+			pst = conn.prepareStatement(query,pst.RETURN_GENERATED_KEYS);
+			pst.setString(1, request.getLogin().getEmail());
+			pst.setString(2, EncryptionDecryptionUtility.encode(request.getLogin().getPassword()));
+			rs = pst.executeQuery();
+			if(rs.next()) {
+				count = rs.getInt(1);
+			} 
+			isLoginSuccessful = count > 0 ? true : false;
+
+		} catch (SQLException e) {
+			e.printStackTrace();
+		} finally{
+			try{
+				if(rs != null) rs.close();
+				if(pst != null) pst.close();
+				if(conn != null) conn.close();
+			} catch(Exception ex){
+				ex.printStackTrace();
+			}
+		}
+		return isLoginSuccessful;
 	}
 }
