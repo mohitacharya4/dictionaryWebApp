@@ -8,4 +8,8 @@ import com.dictionarywebapp.bean.Words;
  public interface UserService {
 	public List<Words> getWordsList();
 	public List<Words> getSampleWordsList();
+	public boolean getPremiumMembership(ApiRequest request); 
+	public boolean addWord(ApiRequest request);
+	public boolean deleteWord(int id);
+	public boolean updateWord(ApiRequest request);
 }

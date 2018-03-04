@@ -8,12 +8,10 @@ import java.sql.SQLException;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Properties;
-
 import com.dictionarywebapp.bean.ApiRequest;
 import com.dictionarywebapp.bean.Words;
 import com.dictionarywebapp.dao.UserDao;
 import com.dictionarywebapp.utilities.Details;
-
 
 
 public class UserDaoImpl implements UserDao{
@@ -118,5 +116,132 @@ public class UserDaoImpl implements UserDao{
 			}
 		}
 		return wordsList;
+	}
+	public boolean getPremiumMembership(ApiRequest request) {
+		boolean isUserRegistered = false;
+		ResultSet rs = null;
+		PreparedStatement pst = null;
+		Connection conn = null;
+		int count = 0;
+		
+		try {
+			conn=getConnection();
+			query = "insert into userdetails (name , password , email, isAdmin)"
+					+ " values (?,?,?,?)";
+			pst = conn.prepareStatement(query,pst.RETURN_GENERATED_KEYS);
+			pst.setString(1, request.getUserDetails().getName());
+			pst.setString(2, request.getUserDetails().getPassword());
+			pst.setString(3, request.getUserDetails().getEmail());
+			pst.setBoolean(4, request.getUserDetails().isAdmin());
+			count =	pst.executeUpdate();
+			rs = pst.getGeneratedKeys();
+			isUserRegistered = count > 0 ? true : false;
+
+		} catch (SQLException e) {
+			e.printStackTrace();
+		} finally{
+			try{
+				if(rs != null) rs.close();
+				if(pst != null) pst.close();
+				if(conn != null) conn.close();
+			} catch(Exception ex){
+				ex.printStackTrace();
+			}
+		}
+		return isUserRegistered;
+	}
+	public boolean addWord(ApiRequest request) {
+		boolean isWordAdded = false;
+		ResultSet rs = null;
+		PreparedStatement pst = null;
+		Connection conn = null;
+		int count = 0;
+		
+		try {
+			conn=getConnection();
+			query = "insert into words (word , meaning , category)"
+					+ " values (?,?,?)";
+			pst = conn.prepareStatement(query,pst.RETURN_GENERATED_KEYS);
+			pst.setString(1, request.getWord().getWord());
+			pst.setString(2, request.getWord().getMeaning());
+			pst.setString(3, request.getWord().getCategory());    //if this field is not required then from front-end send any default value like "Miscellaneous"
+			count =	pst.executeUpdate();
+			rs = pst.getGeneratedKeys();
+			isWordAdded = count > 0 ? true : false;
+
+		} catch (SQLException e) {
+			e.printStackTrace();
+		} finally{
+			try{
+				if(rs != null) rs.close();
+				if(pst != null) pst.close();
+				if(conn != null) conn.close();
+			} catch(Exception ex){
+				ex.printStackTrace();
+			}
+		}
+		return isWordAdded;
+	}
+	public boolean deleteWord(int id) {
+		boolean isWordDeleted = false;
+		ResultSet rs = null;
+		PreparedStatement pst = null;
+		Connection conn = null;
+		int count = 0;
+		
+		try {
+			conn=getConnection();
+			query = "delete from words where id = ?";
+			pst = conn.prepareStatement(query,pst.RETURN_GENERATED_KEYS);
+			pst.setInt(1, id);
+			count =	pst.executeUpdate();
+			rs = pst.getGeneratedKeys();
+			isWordDeleted = count > 0 ? true : false;
+
+		} catch (SQLException e) {
+			e.printStackTrace();
+		} finally{
+			try{
+				if(rs != null) rs.close();
+				if(pst != null) pst.close();
+				if(conn != null) conn.close();
+			} catch(Exception ex){
+				ex.printStackTrace();
+			}
+		}
+		return isWordDeleted;
+	}
+	public boolean updateWord(ApiRequest request) {
+		boolean isWordUpdated = false;
+		ResultSet rs = null;
+		PreparedStatement pst = null;
+		Connection conn = null;
+		int count = 0;
+		
+		try {
+			conn=getConnection();
+			query = "UPDATE words" + 
+					" SET word = ?, meaning = ?, category = ?" + 
+					" WHERE id = ?";
+			pst = conn.prepareStatement(query,pst.RETURN_GENERATED_KEYS);
+			pst.setString(1, request.getWord().getWord());
+			pst.setString(2, request.getWord().getMeaning());
+			pst.setString(3, request.getWord().getCategory());    //if this field is not required then from front-end send any default value like "Miscellaneous"			count =	pst.executeUpdate();
+			pst.setInt(4, request.getWord().getId());
+			rs = pst.getGeneratedKeys();
+			isWordUpdated = count > 0 ? true : false;
+
+		} catch (SQLException e) {
+			e.printStackTrace();
+		} finally{
+			try{
+				if(rs != null) rs.close();
+				if(pst != null) pst.close();
+				if(conn != null) conn.close();
+			} catch(Exception ex){
+				ex.printStackTrace();
+			}
+		}
+		return isWordUpdated;
 	}
 }
