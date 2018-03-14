@@ -156,7 +156,7 @@ public class MainController {
 		else if(abstactionLevel.equals("Premium"))
 			apiResponse.setStatus(constants.getProperty("USER_PREMIUM"));
 		else
-			apiResponse.setStatus(constants.getProperty("USER_BAKRA"));
+			apiResponse.setStatus(constants.getProperty("USER_NOT_PREMIUM_ADMIN"));
 		return apiResponse;
 	}
 }

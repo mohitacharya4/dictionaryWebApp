@@ -300,6 +300,6 @@ public class UserDaoImpl implements UserDao{
 				ex.printStackTrace();
 			}
 		}
-		return "Bakra";
+		return "Login Failed, please check your username and password";
 	}
 }
