@@ -4,6 +4,7 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Properties;
 
+import org.springframework.web.bind.annotation.CrossOrigin;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
@@ -25,6 +26,7 @@ public class MainController {
 	Properties constants = new Properties();
 	
 	/*To get the list of words from the Database*/
+    @CrossOrigin(origins = "*")
 	@RequestMapping(method = RequestMethod.GET, value = "/getWordsList")
 	public ApiResponse getWordsList()
 	{	
@@ -43,6 +45,7 @@ public class MainController {
 		return apiResponse;	
 	}
 	/*To get the list of sample words from the Database*/
+    @CrossOrigin(origins = "*")
 	@RequestMapping(method = RequestMethod.GET, value = "/getSampleWordsList")
 	public ApiResponse getSampleWordsList()
 	{	
@@ -61,6 +64,7 @@ public class MainController {
 		return apiResponse;	
 	}
 	/*To register for premium*/
+    @CrossOrigin(origins = "*")
 	@RequestMapping(method = RequestMethod.POST, value = "/getPremiumRegistration")
 	public ApiResponse getPremiumRegistration(@RequestBody ApiRequest request)
 	{	
@@ -79,6 +83,7 @@ public class MainController {
 		return apiResponse;
 	}
 	/*To add a new word in the list of words*/
+    @CrossOrigin(origins = "*")
 	@RequestMapping(method = RequestMethod.POST, value = "/addNewWord")
 	public ApiResponse addWord(@RequestBody ApiRequest request)
 	{	
@@ -97,6 +102,7 @@ public class MainController {
 		return apiResponse;
 	}
 	/*To delete a word in the list of words*/
+    @CrossOrigin(origins = "*")
 	@RequestMapping(method = RequestMethod.GET, value = "/deleteSelectedWord")
 	public ApiResponse deleteWord(@RequestParam(value = "id") int id)
 	{	
@@ -115,6 +121,7 @@ public class MainController {
 		return apiResponse;
 	}
 	/*To delete a word in the list of words*/
+    @CrossOrigin(origins = "*")
 	@RequestMapping(method = RequestMethod.POST, value = "/updateSelectedWord")
 	public ApiResponse updateWord(@RequestBody ApiRequest request)
 	{	
@@ -133,21 +140,23 @@ public class MainController {
 		return apiResponse;
 	}
 	/*To login the premium member*/
+    @CrossOrigin(origins = "*")
 	@RequestMapping(method = RequestMethod.POST, value = "/loginPremiumUser")
 	public ApiResponse loginPremiumUser(@RequestBody ApiRequest request)
 	{	
 		apiResponse  = new ApiResponse();
-		boolean isLoginSuccessful = false;
+		String abstactionLevel = "";
 		service = new UserServiceImpl();
 		dt = new Details();
 		constants = dt.getConstants();
 
-		isLoginSuccessful = service.loginPremiumUser(request);
-		if(isLoginSuccessful)
-			apiResponse.setStatus(constants.getProperty("API_STATUS_SUCCESS"));
+		abstactionLevel = service.loginPremiumUser(request);
+		if(abstactionLevel.equals("Admin"))
+			apiResponse.setStatus(constants.getProperty("USER_ADMIN"));
+		else if(abstactionLevel.equals("Premium"))
+			apiResponse.setStatus(constants.getProperty("USER_PREMIUM"));
 		else
-			apiResponse.setStatus(constants.getProperty("API_STATUS_FAILURE"));
-		
+			apiResponse.setStatus(constants.getProperty("USER_BAKRA"));
 		return apiResponse;
 	}
 }

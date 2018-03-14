@@ -246,25 +246,48 @@ public class UserDaoImpl implements UserDao{
 		}
 		return isWordUpdated;
 	}
-	public boolean loginPremiumUser(ApiRequest request) {
-		boolean isLoginSuccessful = false;
+	public String loginPremiumUser(ApiRequest request) {
+		boolean isUserPremium = false;
+		boolean isUserAdmin = false;
 		ResultSet rs = null;
+		ResultSet rsAdmin = null;
 		PreparedStatement pst = null;
+		PreparedStatement pstAdmin = null;
 		Connection conn = null;
 		int count = 0;
-		
+		int countAdmin = 0;
+		String queryForPremium = "";
+		String queryForAdmin = "";
 		try {
 			conn=getConnection();
-			query = "select count(1) from userdetails" + 
+			queryForPremium = "select count(1) from userdetails" + 
 					" WHERE email = ? and password = ?";
-			pst = conn.prepareStatement(query,pst.RETURN_GENERATED_KEYS);
+			queryForAdmin = "select count(1) from userdetails" + 
+					" WHERE email = ? and password = ? and isAdmin = ?";
+			pst = conn.prepareStatement(queryForPremium,pst.RETURN_GENERATED_KEYS);
+			pstAdmin = conn.prepareStatement(queryForAdmin,pstAdmin.RETURN_GENERATED_KEYS);
 			pst.setString(1, request.getLogin().getEmail());
 			pst.setString(2, EncryptionDecryptionUtility.encode(request.getLogin().getPassword()));
+			pstAdmin.setString(1, request.getLogin().getEmail());
+			pstAdmin.setString(2, EncryptionDecryptionUtility.encode(request.getLogin().getPassword()));
+			pstAdmin.setInt(3, 1);
+			
 			rs = pst.executeQuery();
+			rsAdmin = pstAdmin.executeQuery();
 			if(rs.next()) {
 				count = rs.getInt(1);
 			} 
-			isLoginSuccessful = count > 0 ? true : false;
+			isUserPremium = count > 0 ? true : false;
+			if(rsAdmin.next()) {
+				countAdmin = rsAdmin.getInt(1);
+			} 
+			isUserAdmin = countAdmin > 0 ? true : false;
+			if(isUserPremium) {
+				if(isUserAdmin) {
+					return "Admin";
+				}
+				return "Premium";
+			}
 
 		} catch (SQLException e) {
 			e.printStackTrace();
@@ -277,6 +300,6 @@ public class UserDaoImpl implements UserDao{
 				ex.printStackTrace();
 			}
 		}
-		return isLoginSuccessful;
+		return "Bakra";
 	}
 }

@@ -36,7 +36,7 @@ public class UserServiceImpl implements UserService{
 		uDao = new UserDaoImpl();
 		return uDao.updateWord(request);
 	}
-	public boolean loginPremiumUser(ApiRequest request) {
+	public String loginPremiumUser(ApiRequest request) {
 		uDao = new UserDaoImpl();
 		return uDao.loginPremiumUser(request);
 	}
