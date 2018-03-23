@@ -159,4 +159,26 @@ public class MainController {
 			apiResponse.setStatus(constants.getProperty("USER_NOT_PREMIUM_ADMIN"));
 		return apiResponse;
 	}
+    /*Forgot password API, will set OTP in DB and will send it to the email*/
+    @CrossOrigin(origins = "*")
+	@RequestMapping(method = RequestMethod.POST, value = "/forgetPassword")
+	public ApiResponse forgetPassword(@RequestBody ApiRequest request)
+	{	
+		apiResponse  = new ApiResponse();
+		service = new UserServiceImpl();
+		apiResponse = service.forgetPassword(request);
+		return apiResponse;
+	}
+    /*Reset password API, will check OTP from DB and will set new password for given email*/
+    @CrossOrigin(origins = "*")
+	@RequestMapping(method = RequestMethod.POST, value = "/resetPassword")
+	public ApiResponse resetPassword(@RequestBody ApiRequest request)
+	{	
+		apiResponse  = new ApiResponse();
+		service = new UserServiceImpl();
+		dt = new Details();
+		constants = dt.getConstants();
+		apiResponse = service.resetPassword(request);
+		return apiResponse;
+	}
 }

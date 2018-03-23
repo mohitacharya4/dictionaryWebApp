@@ -11,9 +11,11 @@ import java.util.Properties;
 import com.dictionarywebapp.bean.ApiRequest;
 import com.dictionarywebapp.bean.Words;
 import com.dictionarywebapp.dao.UserDao;
+import com.dictionarywebapp.serviceImpl.UserServiceImpl;
 import com.dictionarywebapp.utilities.Details;
 import com.dictionarywebapp.utilities.EncryptionDecryptionUtility;
-
+import com.dictionarywebapp.utilities.Mail;
+import com.dictionarywebapp.bean.ApiResponse;;
 
 public class UserDaoImpl implements UserDao{
 	
@@ -22,10 +24,12 @@ public class UserDaoImpl implements UserDao{
 	String sql;
 	String query="";
 	Details dt = new Details();
-	Properties constant =new Properties();
+	Properties constants =new Properties();
 	UserDaoImpl uDao = null;
 	Properties pros = null;
 	ApiRequest request =  null;
+	ApiResponse response = null;
+	UserServiceImpl service = null;
 	
 	/*Method to get an instance of connection*/
 	public Connection getConnection(){
@@ -44,7 +48,7 @@ public class UserDaoImpl implements UserDao{
 		}
 		return conn;
 	}
-	/*Method to get the list of words form the Database*/
+	/*Method to get the list of words from the Database*/
 	public List<Words> getWordsListFromDB() {
 		List<Words> wordsList=new ArrayList<Words>();
 		ResultSet rs = null;
@@ -302,4 +306,133 @@ public class UserDaoImpl implements UserDao{
 		}
 		return "Login Failed, please check your username and password";
 	}
+	/*It will set the OTP in the DB and will send it to the  user mail also.*/
+	public ApiResponse forgetPassword(ApiRequest request) {
+		ResultSet rs = null;
+		PreparedStatement pst = null;
+		Connection conn = null;
+		int count = 0;
+		String otp = null;
+		constants = dt.getConstants();
+		service = new UserServiceImpl();
+		response = new ApiResponse();
+		try {
+			conn=getConnection();
+			query = "UPDATE userdetails" + 
+					" SET otp = ?" + 
+					" WHERE email = ?";
+			otp = service.generateOTP();
+			pst = conn.prepareStatement(query,pst.RETURN_GENERATED_KEYS);
+			pst.setString(1, otp);
+			pst.setString(2, request.getUserDetails().getEmail());
+			count =	pst.executeUpdate();
+			rs = pst.getGeneratedKeys();
+			if(count != 1) {
+				response.setStatus(constants.getProperty("API_STATUS_FAILURE"));
+				response.setMessage(constants.getProperty("OTP_UPDATE_FAILURE"));
+			}
+			else {
+				response = Mail.sendMailToUser(request.getUserDetails().getEmail(), otp, response);
+			}
+		} catch (SQLException e) {
+			e.printStackTrace();
+		}catch (Exception e) {
+			e.printStackTrace();
+		} 
+		finally{
+			try{
+				if(rs != null) rs.close();
+				if(pst != null) pst.close();
+				if(conn != null) conn.close();
+			} catch(Exception ex){
+				ex.printStackTrace();
+			}
+		}
+		return response;
+	}
+	/*To check whether the OTP is valid for provided mail or not*/
+	public boolean checkOtpValidity(ApiRequest request) {
+		ResultSet rs = null;
+		PreparedStatement pst = null;
+		Connection conn = null;
+		int count = 0;
+		constants = dt.getConstants();
+		service = new UserServiceImpl();
+		boolean isOtpValid = false;
+		try {
+			conn=getConnection();
+			query = "SELECT count(1) from userdetails" + 
+					" where otp = ?" + 
+					" and email = ?";
+			pst = conn.prepareStatement(query,pst.RETURN_GENERATED_KEYS);
+			pst.setString(1, request.getUserDetails().getOtp());
+			pst.setString(2, request.getUserDetails().getEmail());
+			rs = pst.executeQuery();
+			if(rs.next()) {
+				count = rs.getInt(1);
+			}
+			if(count == 1) {
+				isOtpValid = true;
+			}
+		} catch (SQLException e) {
+			e.printStackTrace();
+		} finally{
+			try{
+				if(rs != null) rs.close();
+				if(pst != null) pst.close();
+				if(conn != null) conn.close();
+			} catch(Exception ex){
+				ex.printStackTrace();
+			}
+		}
+		return isOtpValid;
+	}
+	/*It will reset the password if the OTP is valid for mailId provided*/
+	public ApiResponse resetPassword(ApiRequest request) {
+		ResultSet rs = null;
+		PreparedStatement pst = null;
+		Connection conn = null;
+		int count = 0;
+		constants = dt.getConstants();
+		service = new UserServiceImpl();
+		boolean isOtpValid = false;
+		response = new ApiResponse();
+		try {
+			isOtpValid = checkOtpValidity(request);
+			conn=getConnection();
+			query = "UPDATE userdetails" + 
+					" SET password = ?" + 
+					" WHERE email = ?";
+			if(isOtpValid) {
+				pst = conn.prepareStatement(query,pst.RETURN_GENERATED_KEYS);
+				pst.setString(1, EncryptionDecryptionUtility.encode(request.getUserDetails().getPassword()));
+				pst.setString(2, request.getUserDetails().getEmail());
+				count =	pst.executeUpdate();
+				rs = pst.getGeneratedKeys();
+				if(count != 1) {
+					response.setStatus(constants.getProperty("API_STATUS_FAILURE"));
+					response.setMessage(constants.getProperty("PASSWORD_UPDATE_FAILURE"));
+				}else {
+					response.setStatus(constants.getProperty("API_STATUS_SUCCESS"));
+					response.setMessage(constants.getProperty("PASSWORD_UPDATE_SUCCESS"));				
+				}
+			}else {
+				response.setStatus(constants.getProperty("API_STATUS_FAILURE"));
+				response.setMessage(constants.getProperty("INVALID_OTP"));	
+			}
+		} catch (SQLException e) {
+			e.printStackTrace();
+		} finally{
+			try{
+				if(rs != null) rs.close();
+				if(pst != null) pst.close();
+				if(conn != null) conn.close();
+			} catch(Exception ex){
+				ex.printStackTrace();
+			}
+		}
+		return response;
+	}
+
+	
 }

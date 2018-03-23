@@ -1,7 +1,7 @@
 package com.dictionarywebapp.bean;
 
 public class UserDetails {
-	String name, password, email;
+	String name, password, email, otp;
 	boolean isAdmin;
 	
 	public String getName() {
@@ -21,6 +21,12 @@ public class UserDetails {
 	}
 	public void setEmail(String email) {
 		this.email = email;
+	}
+	public String getOtp() {
+		return otp;
+	}
+	public void setOtp(String otp) {
+		this.otp = otp;
 	}
 	public boolean isAdmin() {
 		return isAdmin;

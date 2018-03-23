@@ -3,6 +3,7 @@ package com.dictionarywebapp.dao;
 import java.util.List;
 
 import com.dictionarywebapp.bean.ApiRequest;
+import com.dictionarywebapp.bean.ApiResponse;
 import com.dictionarywebapp.bean.Words;
 
 public interface UserDao {
@@ -13,4 +14,6 @@ public interface UserDao {
 	public boolean deleteWord(int id);
 	public boolean updateWord(ApiRequest request);
 	public String loginPremiumUser(ApiRequest request);
+	public ApiResponse forgetPassword(ApiRequest request);
+	public ApiResponse resetPassword(ApiRequest request);
 }
