@@ -304,7 +304,7 @@ public class UserDaoImpl implements UserDao{
 				ex.printStackTrace();
 			}
 		}
-		return "Login Failed, please check your username and password";
+		return "LoginFailed";
 	}
 	/*It will set the OTP in the DB and will send it to the  user mail also.*/
 	public ApiResponse forgetPassword(ApiRequest request) {

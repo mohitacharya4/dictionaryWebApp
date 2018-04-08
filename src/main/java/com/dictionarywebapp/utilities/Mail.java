@@ -61,4 +61,55 @@ public class Mail {
 		}
 		return response;    
 	}
+	/*Send Suggestion word mail to the admin*/
+	public static ApiResponse sendSuggestionMailToAdmin(String word){  
+		Properties props = new Properties();   
+		Properties constants = new Properties();
+		ApiResponse response = new ApiResponse(); 
+		Details dt = new Details();
+		try { 
+			//constants=dt.getConstants();
+			props.load(dt.getPropertyfile("/application.properties"));
+			constants.load(dt.getPropertyfile("/Constants.properties"));
+			String body = props.getProperty("wordSuggestionMailBody") + "<b>" + word + "</b>";
+			final String from = props.getProperty("suggestionMailFrom");
+			final String password = props.getProperty("suggestionMailFromPassword");
+			final String mailTo = props.getProperty("suggestionMailTo");
+			
+			props.put("mail.smtp.host", props.getProperty("host"));    
+			props.put("mail.smtp.socketFactory.port", props.getProperty("socketFactoryPort"));
+			props.put("mail.smtp.socketFactory.class",    
+					props.getProperty("socketFactoryClass"));
+			props.put("mail.smtp.auth", props.getProperty("smtpAuthentication"));    
+			props.put("mail.smtp.port", props.getProperty("smtpPort"));      
+			//get Session   
+			Session session = Session.getDefaultInstance(props,    
+					new javax.mail.Authenticator() {    
+				protected PasswordAuthentication getPasswordAuthentication() {    
+					return new PasswordAuthentication(from,password);  
+				}    
+			});    
+			//compose message    
+			MimeMessage message = new MimeMessage(session);    
+			message.addRecipient(Message.RecipientType.TO,new InternetAddress(mailTo));    
+			message.setSubject(props.getProperty("suggestingWordMailSubject"));    
+			message.setContent(props.getProperty("suggestingWordMailSubject"), "text/html; charset=utf-8");
+			message.setText(body);    
+			message.setContent(body, "text/html; charset=utf-8");
+			//send message  
+			Transport.send(message); 
+			System.out.println("mail sent successfully..."); 
+			response.setStatus(constants.getProperty("API_STATUS_SUCCESS"));
+			response.setMessage(constants.getProperty("SUGGESTION_EMAIL_SEND_MSG"));
+
+		} catch (MessagingException e) {
+			e.printStackTrace();
+			throw new RuntimeException(e);
+		} catch (IOException e) {
+			e.printStackTrace();
+		}catch (Exception e) {
+			e.printStackTrace();
+		}
+		return response;    
+	}
 }

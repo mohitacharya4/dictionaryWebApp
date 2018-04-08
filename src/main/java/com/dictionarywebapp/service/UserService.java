@@ -17,4 +17,5 @@ import com.dictionarywebapp.bean.Words;
 	public ApiResponse forgetPassword(ApiRequest request);
 	public String generateOTP();
 	public ApiResponse resetPassword(ApiRequest request);
+	public ApiResponse sendSuggestionWordMailToAdmin(String word);
 }

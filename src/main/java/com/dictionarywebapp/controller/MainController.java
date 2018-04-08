@@ -176,9 +176,17 @@ public class MainController {
 	{	
 		apiResponse  = new ApiResponse();
 		service = new UserServiceImpl();
-		dt = new Details();
-		constants = dt.getConstants();
 		apiResponse = service.resetPassword(request);
 		return apiResponse;
 	}
+    /*Send the suggestion word Mail to the Admin for review*/
+    @CrossOrigin(origins = "*")
+   	@RequestMapping(method = RequestMethod.GET, value = "/sendSuggestionWordMailToAdmin")
+   	public ApiResponse sendSuggestionWordMailToAdmin(@RequestParam(value = "word") String word)
+   	{	
+   		apiResponse  = new ApiResponse();
+   		service = new UserServiceImpl();
+   		apiResponse = service.sendSuggestionWordMailToAdmin(word);
+   		return apiResponse;
+   	}
 }

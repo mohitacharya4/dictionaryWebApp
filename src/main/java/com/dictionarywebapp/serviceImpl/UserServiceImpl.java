@@ -10,6 +10,7 @@ import com.dictionarywebapp.bean.Words;
 import com.dictionarywebapp.daoImpl.UserDaoImpl;
 import com.dictionarywebapp.service.UserService;
 import com.dictionarywebapp.utilities.Details;
+import com.dictionarywebapp.utilities.Mail;
 
 public class UserServiceImpl implements UserService{
 	UserDaoImpl uDao;
@@ -83,5 +84,8 @@ public class UserServiceImpl implements UserService{
 	public ApiResponse resetPassword(ApiRequest request) {
 		uDao = new UserDaoImpl();
 		return uDao.resetPassword(request);
+	}
+	public ApiResponse sendSuggestionWordMailToAdmin(String word) {
+		return Mail.sendSuggestionMailToAdmin(word);
 	}
 }
